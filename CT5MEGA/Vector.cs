@@ -9,6 +9,7 @@ public sealed partial class Vector(float x, float y , float z)
     // copy constructor
     public Vector(Vector a) : this (a.x, a.y, a.z) { }
     
+    // set values
     public void Set(Vector a)
     {
         x = a.x;
@@ -18,26 +19,33 @@ public sealed partial class Vector(float x, float y , float z)
     
     public override string ToString() => $"({x}, {y}, {z})";
     
+    // return values as tuple
     public (float x, float y, float z) Tuple => (x, y, z);
 }
 
 public sealed partial class Vector
 { // vector operations
     
+    // using pythagoras
     public float Magnitude => MathF.Sqrt(x * x + y * y + z * z);
 
     public Vector Normalised => Normalise(this);
+    public static Vector Normalise(Vector a) => a / a.Magnitude;
+    public void Normalise() => Set(Normalise(this)); // sets vector to its normalised value
     
-    public bool Equals(Vector other)
+    // comparing two Vectors
+    public static bool Equals(Vector a, Vector b)
     { 
         const float tolerance = 0.00001f;
-        return Math.Abs(x - other.x) < tolerance && Math.Abs(y - other.y) < tolerance && Math.Abs(z - other.z) < tolerance;
+        return Math.Abs(a.x - b.x) < tolerance && Math.Abs(a.y - b.y) < tolerance && Math.Abs(a.z - b.z) < tolerance;
     }
-    public static bool Equals(Vector a, Vector b) => a.Equals(b);
+    public bool Equals(Vector other) => Equals(this, other); // concise syntax
     
+    // Dot product of two vectors
     public static float Dot(Vector a, Vector b) => (a.x * b.x) + (a.y * b.y) + (a.z * b.z);
-    public float Dot(Vector b) => Dot(this, b);
+    public float Dot(Vector b) => Dot(this, b); // concise syntax
     
+    // Distance between two vector positions
     public static float Distance(Vector a, Vector b)
     {
         float dx = a.x - b.x;
@@ -46,37 +54,43 @@ public sealed partial class Vector
         
         return MathF.Sqrt(dx*dx + dy*dy + dz*dz);
     }
-    public float Distance(Vector b) => Distance(this, b);
+    public float Distance(Vector other) => Distance(this, other); // concise syntax
     
+    // Angle between two vectors
     public static float Angle(Vector a, Vector b) => MathF.Acos(Dot(a, b) / (a.Magnitude * b.Magnitude));
-    public float Angle(Vector b) => Angle(this, b);
+    public float Angle(Vector other) => Angle(this, other); // concise syntax
     
+    // Cross product of two vectors
     public static Vector Cross(Vector a, Vector b) => new(a.y * b.z - a.z * b.y, a.z*b.x - a.x*b.z, a.x*b.y - a.y*b.x);
-    public void Cross(Vector b) => Set(Cross(this, b));
+    public void Cross(Vector other) => Set(Cross(this, other)); // Concise syntax, acts on this
 
-    public static Vector Normalise(Vector a) => a / a.Magnitude;
-    public void Normalise() => Set(Normalise(this));
-
+    // Scales a Vector by another Vector component-wise (wraps * operator)
     public static Vector Scale(Vector a, Vector b) => a * b;
-    public void Scale(Vector b) => Set(Scale(this, b));
+    public void Scale(Vector other) => Set(Scale(this, other)); // concise syntax, acts on this
     
+    // clamps the magnitude of a Vector, returns new vector
     public static Vector ClampMagnitude(Vector a, float maxlength) => a.Magnitude > maxlength ? Normalise(a) * maxlength : a;
-    public void ClampMagnitude(float maxlength) => Set(ClampMagnitude(this, maxlength));
+    public void ClampMagnitude(float maxlength) => Set(ClampMagnitude(this, maxlength)); // concise syntax, acts on vector
     
+    // calculates the midpoint of two vectors
     public static Vector Midpoint(Vector a, Vector b) => a + (b - a) * 0.5f;
-
+    
+    // calculates the vector from a to b
     public static Vector Between(Vector a, Vector b) => b - a;
-    public Vector From(Vector a) => Between(a, this);
-    public Vector To(Vector b) => Between(this, b);
+    public Vector From(Vector other) => Between(other, this); // concise syntax for second operand
+    public Vector To(Vector other) => Between(this, other); // concise syntax for first operand
 
+    // returns a vector with the largest values of each of the vectors
     public static Vector Max(Vector a, Vector b) => new(Math.Max(a.x, b.x), Math.Max(a.y, b.y), Math.Max(a.z, b.z));
-    public void Maximise(Vector b) => Set(Max(this, b));
+    public void Maximise(Vector b) => Set(Max(this, b)); // concise syntax, acts on this
     
+    // returns a vector with the largest values of each of the vectors
     public static Vector Min(Vector a, Vector b) => new(Math.Min(a.x, b.x), Math.Min(a.y, b.y), Math.Min(a.z, b.z));
-    public void Minimise(Vector b) => Set(Min(this, b));
+    public void Minimise(Vector b) => Set(Min(this, b)); // concise syntax, acts on this
     
+    // projects a vector onto another vector
     public static Vector Project(Vector a, Vector b) => b * Dot(a, b);
-    public void Project(Vector b) => Set(Project(this, b));
+    public void Project(Vector b) => Set(Project(this, b)); // concise syntax, acts on this
 }
 
 public sealed partial class Vector
