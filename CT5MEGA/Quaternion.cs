@@ -9,7 +9,7 @@ public sealed partial class Quaternion
     public float z { get; }
     
     // returns vector part
-    public Vector3 v => new (x, y, z);
+    public Vector3D v => new (x, y, z);
     
     // inverse of the quaternion
     public Quaternion Inverse => new (w, (-x, -y, -z));
@@ -25,7 +25,7 @@ public sealed partial class Quaternion
     }
     
     // constructor from angle and axis parts
-    public Quaternion(float angle, Vector3 axis)
+    public Quaternion(float angle, Vector3D axis)
     {
         const float deg2Rad = MathF.PI / 180;
         float halfAngle = angle * deg2Rad * 0.5f;
@@ -36,7 +36,7 @@ public sealed partial class Quaternion
     }
 
     // constructor for 0 real part
-    public Quaternion(Vector3 v)
+    public Quaternion(Vector3D v)
     {
         w = 0;
         x = v.x;
@@ -50,10 +50,10 @@ public sealed partial class Quaternion
 public sealed partial class Quaternion
 {
     // Multiplies quaternions
-    public static Quaternion operator *(Quaternion a, Quaternion b) => new (b.w * a.w - Vector3.Dot(b.v, a.v), (b.w * a.v + a.w * b.v + Vector3.Cross(a.v, b.v)).Tuple);
+    public static Quaternion operator *(Quaternion a, Quaternion b) => new (b.w * a.w - Vector3D.Dot(b.v, a.v), (b.w * a.v + a.w * b.v + Vector3D.Cross(a.v, b.v)).Tuple);
     
     // rotates a vector by a quaternion
-    public static Vector3 Rotate(Quaternion q, Vector3 p) => (q * new Quaternion(p) * q.Inverse).v;
+    public static Vector3D Rotate(Quaternion q, Vector3D p) => (q * new Quaternion(p) * q.Inverse).v;
 }
 
 

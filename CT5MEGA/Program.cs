@@ -2,13 +2,8 @@
 
 Console.WriteLine("Hello, World!");
 
-Vector3 a = new(5, -3, 1);
+Quaternion a = new(0.7071068f, (0.5f, 0.5f, 0));
+Quaternion b = new(-0.7071068f, (0, 0, 0.7071068f));
 
-Quaternion q = new(90, new Vector3(1,0,0));
 
-Vector3 c = Quaternion.Rotate(q, a);
-
-Console.WriteLine(a);
-Console.WriteLine(q);
-Console.WriteLine(c);
-Console.WriteLine(c.Equals(a));
+Console.WriteLine(a * b);
