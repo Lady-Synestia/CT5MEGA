@@ -7,18 +7,21 @@ namespace CT5MEGA;
 
 public sealed partial class Quaternion
 {
-    public float w { get; }
-    public float x { get; } 
-    public float y { get; }
-    public float z { get; }
+    public float w { get; set; }
+    public float x { get; set; } 
+    public float y { get; set; }
+    public float z { get; set; }
     
     // returns vector part
     public Vector3D v => new (x, y, z);
     
     // inverse of the quaternion
     public Quaternion Inverse => new (w, (-x, -y, -z));
-    
 
+    public float Magnitude => MathF.Sqrt(w*w + x*x + y*y + z*z);
+    
+    public Quaternion Normalised => new (w/Magnitude, (x/Magnitude, y/Magnitude, z/Magnitude));
+    
     // constructor from real and vector parts
     public Quaternion(float w, (float x, float y, float z)tuple)
     {
@@ -31,19 +34,40 @@ public sealed partial class Quaternion
     // constructor from angle and axis parts
     public Quaternion(float angle, Vector3D axis)
     {
-        float halfAngle = angle * (MathF.PI / 180) * 0.5f;
+        axis = axis.Normalised;
+        angle *= MathF.PI / 180;
+        float halfAngle = angle * 0.5f;
         w = MathF.Cos(halfAngle);
-        axis *= MathF.Sin(halfAngle);
-        x = axis.x;
-        y = axis.y;
-        z = axis.z;
+        x = axis.x * MathF.Sin(halfAngle);
+        y = axis.y * MathF.Sin(halfAngle);
+        z = axis.z * MathF.Sin(halfAngle);
+    }
+
+    public Quaternion(Vector3D angles)
+    {
+        angles *= MathF.PI / 180;
+        
+        Quaternion qx = new(angles.x, Vector3D.X);
+        Quaternion qy = new(angles.y, Vector3D.Y);
+        Quaternion qz = new(angles.z, Vector3D.Z);
+
+        Quaternion qt = qx * qy;
+        Quaternion q = qt * qz;
+        w = q.w;
+        x = q.x;
+        y = q.y;
+        z = q.z;
     }
 
     // constructor from rotation matrix
     public Quaternion(Matrix4D mat)
     {
+        /*
+         * Maths for calculation from: https://www.opengl-tutorial.org/assets/faq_quaternions/index.html#Q55
+         */
+        
         float trace = 1 + mat.F.x + mat.U.y + mat.R.z;
-        if (trace > 0.00000001)
+        if (trace > 0.000001)
         {
             float s = MathF.Sqrt(trace) * 2;
             w = 0.25f * s;
@@ -51,7 +75,7 @@ public sealed partial class Quaternion
             y = (mat.F.z - mat.R.x) / s;
             z = (mat.U.x - mat.F.y) / s;
         }
-        else if (mat.F.x > mat.U.y && mat.F.x < mat.R.z)
+        else if (mat.F.x - mat.U.y > 0.000001 && mat.F.x - mat.R.z > 0.000001)
         {
             float s = MathF.Sqrt(1.0f + mat.F.x - mat.U.y - mat.R.z) * 2;
             w = (mat.R.y - mat.U.z) / s;
@@ -59,7 +83,7 @@ public sealed partial class Quaternion
             y = (mat.F.z + mat.R.x) / s;
             z = (mat.U.x + mat.U.y) / s;
         }
-        else if (mat.U.y > mat.R.z)
+        else if (mat.U.y - mat.R.z > 0.000001)
         {
             float s = MathF.Sqrt(1.0f + mat.U.y - mat.F.x - mat.R.z) * 2;
             w = (mat.U.z - mat.R.x) / s;
@@ -76,7 +100,7 @@ public sealed partial class Quaternion
             z = 0.25f * s;
         }
     }
-
+    
     public (float angle, Vector3D axis) GetAxisAngle()
     {
         float halfAngle = MathF.Acos(w);
@@ -85,15 +109,16 @@ public sealed partial class Quaternion
     }
 
     // constructor for 0 real part
-    public Quaternion(Vector3D v)
+    public Quaternion(Vector3D v, float w=0)
     {
-        w = 0;
+        this.w = w;
         x = v.x;
         y = v.y;
         z = v.z;
     }
     
-    public override string ToString() => $"{w} + {x}i + {y}j + {z}k";
+    public override string ToString() => $"{MathF.Round(w, 4)} + {MathF.Round(x, 4)}i + {MathF.Round(y, 4)}j + {MathF.Round(z, 4)}k";
+    //public override string ToString() => $"{w} + {x}i + {y}j + {z}k";
 }
 
 public sealed partial class Quaternion

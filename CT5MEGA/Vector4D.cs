@@ -36,8 +36,8 @@ public sealed partial class Vector4D(float x, float y, float z, float w)
         z = a.z;
         w = a.w;
     }
-    
-    public override string ToString() => $"({x}, {y}, {z}, {w})";
+
+    public override string ToString() => $"{MathF.Round(x, 4)}, {MathF.Round(y, 4)}, {MathF.Round(z, 4)}, {MathF.Round(w, 4)}";
 }
 
 public sealed partial class Vector4D

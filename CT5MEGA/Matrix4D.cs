@@ -41,6 +41,8 @@ public sealed class Matrix4D(Vector4D f, Vector4D u, Vector4D  r, Vector4D w)
         Vector3D.Dot(m.F, v), 
         Vector3D.Dot(m.U, v), 
         Vector3D.Dot(m.R, v));*/
+    
+    public override string ToString() => $"F: {F}\nU: {U}\nR: {R}\nW: {W}";
 
     public static Matrix4D operator *(Matrix4D a, Matrix4D b) => new(
         a * b.F,
@@ -73,12 +75,13 @@ public sealed class Matrix4D(Vector4D f, Vector4D u, Vector4D  r, Vector4D w)
         new Vector4D(worldPos, 1));
 
     // rotation matrix from euler angles
-    
     public static Matrix4D Rotation(Vector3D angles)
     {
         /*
          * Maths for calculation from: https://www.opengl-tutorial.org/assets/faq_quaternions/index.html#Q36
          */
+        
+        angles *= MathF.PI / 180;
         
         float A = MathF.Cos(angles.x);
         float B = MathF.Sin(angles.x);
@@ -90,11 +93,17 @@ public sealed class Matrix4D(Vector4D f, Vector4D u, Vector4D  r, Vector4D w)
         float AD = A * D;
         float BD = B * D;
 
-        return new Matrix4D(
+        /*return new Matrix4D(
             new Vector4D(C * E, BD * E + A * F, -AD * E + B * F,0),
             new Vector4D(-C * F, -BD * F + A * E, AD * F + B * E, 0),
             new Vector4D(D, -B * C, A * C, 0),
             new Vector4D(0, 0, 0, 1)
+        );*/
+        return new Matrix4D(
+            new Vector4D(C * E,-C * F,D,0),
+            new Vector4D(BD * E + A * F, -BD * F + A * E,-B * C,0),
+            new Vector4D(-AD * E + B * F,AD * F + B * E,A * C,0),
+            new Vector4D(0,0,0,1)
         );
     }
 
@@ -104,6 +113,8 @@ public sealed class Matrix4D(Vector4D f, Vector4D u, Vector4D  r, Vector4D w)
         /*
          * Maths for calculation from: https://www.opengl-tutorial.org/assets/faq_quaternions/index.html#Q54
          */
+        
+        //quaternion = quaternion.Normalised;
         
         float xx = quaternion.x * quaternion.x;
         float xy = quaternion.x * quaternion.y;
@@ -116,11 +127,32 @@ public sealed class Matrix4D(Vector4D f, Vector4D u, Vector4D  r, Vector4D w)
         
         float zz = quaternion.z * quaternion.z;
         float zw = quaternion.z * quaternion.w;
-
+        
         return new Matrix4D(
-            new Vector4D(1-2*(yy + zz), 2*(xy - zw), 2*xz + yw, 0),
+            new Vector4D(1-2*(yy + zz), 2*(xy - zw), 2*(xz + yw), 0),
             new Vector4D(2*(xy + zw), 1-2*(xx + zz), 2*(yz-xw), 0),
             new Vector4D(2*(xz-yw), 2*(yz+xw), 1-2*(xx + yy), 0),
+            new Vector4D(0, 0, 0, 1)
+            );
+    }
+    
+    // rotation matrix from axis-angle
+    public static Matrix4D Rotation(float angle, Vector3D axis)
+    {
+        /*
+         * Maths for calculation from: https://www.opengl-tutorial.org/assets/faq_quaternions/index.html#Q38
+         */
+        
+        axis = axis.Normalised;
+        angle *= MathF.PI / 180;
+        
+        float rcos = MathF.Cos(angle);
+        float rsin = MathF.Sin(angle);
+
+        return new Matrix4D(
+            new Vector4D(rcos + axis.x*axis.x*(1-rcos), -axis.z*rsin + axis.x*axis.y*(1-rcos), axis.y*rsin + axis.x*axis.z*(1-rcos), 0),
+            new Vector4D(axis.z * rsin + axis.y*axis.x*(1-rcos), rcos + axis.y*axis.y*(1-rcos), -axis.x*rsin + axis.y*axis.z*(1-rcos), 0),
+            new Vector4D(-axis.y*rsin + axis.z*axis.x*(1-rcos), axis.x*rsin + axis.y*axis.z*(1-rcos), rcos + axis.z*axis.z*(1-rcos), 0),
             new Vector4D(0, 0, 0, 1)
             );
     }
@@ -148,5 +180,6 @@ public sealed class Matrix4D(Vector4D f, Vector4D u, Vector4D  r, Vector4D w)
         return yaw * (pitch * roll);
     }
 
+    // order of operations: Scale -> Rotate -> Translate
     public static Matrix4D TRS(Vector3D translationVector, Vector3D eulerAngles, Vector3D scaleVector) => Translation(translationVector) * (Rotation(eulerAngles) * Scale(scaleVector));
 }

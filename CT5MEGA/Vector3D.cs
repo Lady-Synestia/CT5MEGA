@@ -32,9 +32,9 @@ public sealed partial class Vector3D(float x, float y , float z)
         MathF.Cos(roll), 
         MathF.Sin(roll),
         0);
-    
-    
-    public override string ToString() => $"({x}, {y}, {z})";
+
+
+    public override string ToString() => $"{MathF.Round(x, 4)}, {MathF.Round(y, 4)}, {MathF.Round(z, 4)}";
     
     // return values as tuple
     public (float x, float y, float z) Tuple => (x, y, z);
