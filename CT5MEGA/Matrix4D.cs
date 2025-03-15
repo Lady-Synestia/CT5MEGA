@@ -36,10 +36,11 @@ public sealed class Matrix4D(Vector4D f, Vector4D u, Vector4D  r, Vector4D w)
         Vector4D.Dot(m.U, v), 
         Vector4D.Dot(m.R, v), 
         Vector4D.Dot(m.W, v));
-    public static Vector3D operator *(Matrix4D m, Vector3D v) => new(
-        Vector3D.Dot(m.F.To3D, v), 
-        Vector3D.Dot(m.U.To3D, v), 
-        Vector3D.Dot(m.R.To3D, v));
+      
+    /*public static Vector3D operator *(Matrix4D m, Vector3D v) => new(
+        Vector3D.Dot(m.F, v), 
+        Vector3D.Dot(m.U, v), 
+        Vector3D.Dot(m.R, v));*/
 
     public static Matrix4D operator *(Matrix4D a, Matrix4D b) => new(
         a * b.F,
@@ -52,7 +53,18 @@ public sealed class Matrix4D(Vector4D f, Vector4D u, Vector4D  r, Vector4D w)
         new Vector3D(scaleX, 0, 0), 
         new Vector3D(0, scaleY, 0), 
         new Vector3D(0, 0, scaleZ));
-    public static Matrix4D Scale(Vector3D scale) => Scale(scale.x, scale.y, scale.z);
+
+    public static Matrix4D Scale(Vector3D scaleVector) => new(
+        new Vector3D(scaleVector.x, 0, 0),
+        new Vector3D(0, scaleVector.y, 0),
+        new Vector3D(0, 0, scaleVector.z)
+        );
+
+    public static Matrix4D Scale(float scale) => new(
+        new Vector3D(scale, 0, 0),
+        new Vector3D(0, scale, 0),
+        new Vector3D(0, 0, scale)
+        );
     
     public static Matrix4D Translation(Vector3D worldPos) => new(
         Vector4D.X, 
@@ -60,12 +72,65 @@ public sealed class Matrix4D(Vector4D f, Vector4D u, Vector4D  r, Vector4D w)
         Vector4D.Z, 
         new Vector4D(worldPos, 1));
 
+    // rotation matrix from euler angles
+    
     public static Matrix4D Rotation(Vector3D angles)
+    {
+        /*
+         * Maths for calculation from: https://www.opengl-tutorial.org/assets/faq_quaternions/index.html#Q36
+         */
+        
+        float A = MathF.Cos(angles.x);
+        float B = MathF.Sin(angles.x);
+        float C = MathF.Cos(angles.y);
+        float D = MathF.Sin(angles.y);
+        float E = MathF.Cos(angles.z);
+        float F = MathF.Sin(angles.z);
+
+        float AD = A * D;
+        float BD = B * D;
+
+        return new Matrix4D(
+            new Vector4D(C * E, BD * E + A * F, -AD * E + B * F,0),
+            new Vector4D(-C * F, -BD * F + A * E, AD * F + B * E, 0),
+            new Vector4D(D, -B * C, A * C, 0),
+            new Vector4D(0, 0, 0, 1)
+        );
+    }
+
+    // rotation matrix from quaternion
+    public static Matrix4D Rotation(Quaternion quaternion)
+    {
+        /*
+         * Maths for calculation from: https://www.opengl-tutorial.org/assets/faq_quaternions/index.html#Q54
+         */
+        
+        float xx = quaternion.x * quaternion.x;
+        float xy = quaternion.x * quaternion.y;
+        float xz = quaternion.x * quaternion.z;
+        float xw = quaternion.x * quaternion.w;
+        
+        float yy = quaternion.y * quaternion.y;
+        float yz = quaternion.y * quaternion.z;
+        float yw = quaternion.y * quaternion.w;
+        
+        float zz = quaternion.z * quaternion.z;
+        float zw = quaternion.z * quaternion.w;
+
+        return new Matrix4D(
+            new Vector4D(1-2*(yy + zz), 2*(xy - zw), 2*xz + yw, 0),
+            new Vector4D(2*(xy + zw), 1-2*(xx + zz), 2*(yz-xw), 0),
+            new Vector4D(2*(xz-yw), 2*(yz+xw), 1-2*(xx + yy), 0),
+            new Vector4D(0, 0, 0, 1)
+            );
+    }
+
+    public static Matrix4D RotationInefficient(Vector3D angles)
     {
         Matrix4D roll = new(
             new Vector4D(MathF.Cos(angles.z), MathF.Sin(angles.z), 0, 0),
-            new Vector4D(-MathF.Sin(angles.z), MathF.Cos(angles.z), 0, 0), 
-            Vector4D.Z, 
+            new Vector4D(-MathF.Sin(angles.z), MathF.Cos(angles.z), 0, 0),
+            Vector4D.Z,
             Vector4D.W);
 
         Matrix4D pitch = new(
@@ -79,9 +144,9 @@ public sealed class Matrix4D(Vector4D f, Vector4D u, Vector4D  r, Vector4D w)
             Vector4D.Y,
             new Vector4D(MathF.Sin(angles.y), 0, MathF.Cos(angles.y), 0),
             Vector4D.W);
-        
+
         return yaw * (pitch * roll);
     }
-    
+
     public static Matrix4D TRS(Vector3D translationVector, Vector3D eulerAngles, Vector3D scaleVector) => Translation(translationVector) * (Rotation(eulerAngles) * Scale(scaleVector));
 }

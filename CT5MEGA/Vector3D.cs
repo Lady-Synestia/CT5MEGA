@@ -12,8 +12,8 @@ public sealed partial class Vector3D(float x, float y , float z)
     // copy constructor
     public Vector3D(Vector3D a) : this (a.x, a.y, a.z) { }
     
-    // constructor from 4D vector
-    public Vector3D(Vector4D a) : this (a.x, a.y, a.z) { }
+    // implicit conversion from 4D Vector
+    public static implicit operator Vector3D(Vector4D v) => new(v.x, v.y, v.z);
     
     // set values
     public void Set(Vector3D a)
@@ -24,8 +24,14 @@ public sealed partial class Vector3D(float x, float y , float z)
     }
     
     // x: pitch, y: yaw, z: roll
-    public static Vector3D FromAngles(Vector3D angles) => new (MathF.Cos(angles.y) * MathF.Cos(angles.x), MathF.Sin(angles.x), MathF.Cos(angles.x) * MathF.Sin(angles.y));
-    public static Vector3D FromAngles2D(float roll) => new(MathF.Cos(roll), MathF.Sin(roll), 0);
+    public static Vector3D FromAngles(Vector3D angles) => new (
+        MathF.Cos(angles.y) * MathF.Cos(angles.x), 
+        MathF.Sin(angles.x), 
+        MathF.Cos(angles.x) * MathF.Sin(angles.y));
+    public static Vector3D FromAngles2D(float roll) => new(
+        MathF.Cos(roll), 
+        MathF.Sin(roll),
+        0);
     
     
     public override string ToString() => $"({x}, {y}, {z})";
@@ -71,7 +77,10 @@ public sealed partial class Vector3D
     public static float Angle(Vector3D a, Vector3D b) => MathF.Acos(Dot(a, b) / (a.Magnitude * b.Magnitude));
     
     // Cross product of two vectors
-    public static Vector3D Cross(Vector3D a, Vector3D b) => new(a.y * b.z - a.z * b.y, a.z*b.x - a.x*b.z, a.x*b.y - a.y*b.x);
+    public static Vector3D Cross(Vector3D a, Vector3D b) => new(
+        a.y * b.z - a.z * b.y, 
+        a.z*b.x - a.x*b.z, 
+        a.x*b.y - a.y*b.x);
     
     // clamps the magnitude of a Vector, returns new vector
     public static Vector3D ClampMagnitude(Vector3D a, float maxlength) => a.Magnitude > maxlength ? Normalise(a) * maxlength : a;
@@ -89,11 +98,17 @@ public sealed partial class Vector3D
     public Vector3D To(Vector3D other) => Between(this, other); // concise syntax for first operand
 
     // returns a vector with the largest values of each of the vectors
-    public static Vector3D Max(Vector3D a, Vector3D b) => new(Math.Max(a.x, b.x), Math.Max(a.y, b.y), Math.Max(a.z, b.z));
+    public static Vector3D Max(Vector3D a, Vector3D b) => new(
+        Math.Max(a.x, b.x), 
+        Math.Max(a.y, b.y), 
+        Math.Max(a.z, b.z));
     public void Maximise(Vector3D b) => Set(Max(this, b)); // concise syntax, acts on this
     
     // returns a vector with the largest values of each of the vectors
-    public static Vector3D Min(Vector3D a, Vector3D b) => new(Math.Min(a.x, b.x), Math.Min(a.y, b.y), Math.Min(a.z, b.z));
+    public static Vector3D Min(Vector3D a, Vector3D b) => new(
+        Math.Min(a.x, b.x), 
+        Math.Min(a.y, b.y), 
+        Math.Min(a.z, b.z));
     public void Minimise(Vector3D b) => Set(Min(this, b)); // concise syntax, acts on this
     
     // projects a vector onto another vector
@@ -104,16 +119,34 @@ public sealed partial class Vector3D
 { // component-wise operations
     
     // vector * vector is the Scalar Product of the vectors
-    public static Vector3D operator *(Vector3D a, Vector3D b) => new (a.x * b.x, a.y * b.y, a.z * b.z);
-    public static Vector3D operator *(Vector3D v, float s) => new (v.x * s, v.y * s, v.z * s);
+    public static Vector3D operator *(Vector3D a, Vector3D b) => new (
+        a.x * b.x, 
+        a.y * b.y, 
+        a.z * b.z);
+    public static Vector3D operator *(Vector3D v, float s) => new (
+        v.x * s, 
+        v.y * s, 
+        v.z * s);
     public static Vector3D operator *(float s, Vector3D v) => v * s;
     
-    public static Vector3D operator /(Vector3D a, Vector3D b) => new (a.x / b.x, a.y / b.y, a.z / b.z);
-    public static Vector3D operator /(Vector3D a, float s) => new (a.x / s, a.y / s, a.z / s);
+    public static Vector3D operator /(Vector3D a, Vector3D b) => new (
+        a.x / b.x, 
+        a.y / b.y, 
+        a.z / b.z);
+    public static Vector3D operator /(Vector3D a, float s) => new (
+        a.x / s, 
+        a.y / s, 
+        a.z / s);
     
-    public static Vector3D operator +(Vector3D a, Vector3D b) => new (a.x + b.x, a.y + b.y, a.z + b.z);
+    public static Vector3D operator +(Vector3D a, Vector3D b) => new (
+        a.x + b.x, 
+        a.y + b.y, 
+        a.z + b.z);
     
-    public static Vector3D operator -(Vector3D a, Vector3D b) => new (a.x - b.x, a.y - b.y, a.z - b.z);
+    public static Vector3D operator -(Vector3D a, Vector3D b) => new (
+        a.x - b.x, 
+        a.y - b.y, 
+        a.z - b.z);
 }
 
 public sealed partial class Vector3D
