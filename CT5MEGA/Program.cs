@@ -38,8 +38,8 @@ AxisAlignedBoundingBox localBox = new(vertices);
 Console.WriteLine(localBox);
 
 
-Vector3D g1 = new(-1, 0.5f, 0);
-Vector3D g2 = new(6, 0.5f, 0);
+Vector3D g1 = new(-1, 0.5, 0);
+Vector3D g2 = new(6, 0.5, 0);
 Console.WriteLine($"global: {g1} -> {g2}");
 
 Vector3D l1 = inverse * g1;

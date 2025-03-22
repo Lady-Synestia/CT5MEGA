@@ -2,18 +2,18 @@
 
 public static class Maths
 {
-    public const float Pi = 3.141592653f;
-    
-    public const float Tolerance = 0.00001f;
+    public const double Tolerance = 0.00000001f;
 
-    public const float Radians = 180 / Pi;
+    public const double Radians = Math.PI / 180;
 
-    public static float Clamp(float value)
+    public static double Clamp(double value)
     {
-        if (MathF.Abs(value - MathF.Round(value)) < Tolerance)
+        if (Math.Abs(value - Math.Round(value)) < Tolerance)
         {
-            return MathF.Round(value);
+            return Math.Round(value);
         }
         return value;
     }
+    
+    public static bool Equal(double x, double y) => Math.Abs(x - y) < Tolerance;
 }

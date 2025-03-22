@@ -3,12 +3,12 @@ using System.Runtime.CompilerServices;
 
 namespace CT5MEGA;
 
-public sealed partial class Matrix4D(Vector4D f, Vector4D u, Vector4D r, Vector4D w)
+public sealed partial record Matrix4D(Vector4D F, Vector4D U, Vector4D R, Vector4D W)
 {
-    public Vector4D F { get; } = f;
-    public Vector4D U { get; } = u;
-    public Vector4D R { get; } = r;
-    public Vector4D W { get; } = w;
+    public Vector4D F { get; } = F;
+    public Vector4D U { get; } = U;
+    public Vector4D R { get; } = R;
+    public Vector4D W { get; } = W;
 
     public override string ToString()
     {
@@ -59,7 +59,7 @@ public sealed partial class Matrix4D(Vector4D f, Vector4D u, Vector4D r, Vector4
         Vector4D.Dot(W, v));
 }
 
-public sealed partial class Matrix4D
+public sealed partial record Matrix4D
 {
 
     public Vector3D EulerAngles()
@@ -68,28 +68,27 @@ public sealed partial class Matrix4D
          * Maths for calculation from: https://www.opengl-tutorial.org/assets/faq_quaternions/index.html#Q37
          */
         
-        float angleX;
-        float angleZ;
-        float angleY = MathF.Asin(F.z);
-        float c = MathF.Cos(angleY);
-        angleY *= 180 / MathF.PI;
+        double angleX; double angleZ;
+        double angleY = Math.Asin(F.z);
+        double c = Math.Cos(angleY);
+        angleY *= Maths.Radians;
 
-        if (MathF.Abs(angleY) > 0.005f)
+        if (Math.Abs(angleY) > 0.005f)
         {
-            float trX = R.z / c;
-            float trY = -U.z / c;
-            angleX = MathF.Atan2(trY, trX) * (180 / MathF.PI);
+            double trX = R.z / c;
+            double trY = -U.z / c;
+            angleX = Math.Atan2(trY, trX) * (180 / Math.PI);
 
             trX = F.x / c;
             trY = -F.y / c;
-            angleZ = MathF.Atan2(trY, trX) * (180 / MathF.PI);
+            angleZ = Math.Atan2(trY, trX) * (180 / Math.PI);
         }
         else
         {
             angleX = 0;
-            float trX = U.y;
-            float trY = U.x;
-            angleZ = MathF.Atan2(trY, trX) * (180 / MathF.PI);
+            double trX = U.y;
+            double trY = U.x;
+            angleZ = Math.Atan2(trY, trX) * (180 / Math.PI);
         }
         
         if (angleX < 0) { angleX += 360; }
@@ -100,7 +99,7 @@ public sealed partial class Matrix4D
     }   
     
     
-    public static Matrix4D Scale(float scaleX, float scaleY, float scaleZ) => new(
+    public static Matrix4D Scale(double scaleX, double scaleY, double scaleZ) => new(
         new Vector3D(scaleX, 0, 0), 
         new Vector3D(0, scaleY, 0), 
         new Vector3D(0, 0, scaleZ));
@@ -111,7 +110,7 @@ public sealed partial class Matrix4D
         new Vector3D(0, 0, scaleVector.z)
         );
 
-    public static Matrix4D Scale(float scale) => new(
+    public static Matrix4D Scale(double scale) => new(
         new Vector3D(scale, 0, 0),
         new Vector3D(0, scale, 0),
         new Vector3D(0, 0, scale)
@@ -128,17 +127,17 @@ public sealed partial class Matrix4D
          * Simplified version of Matrix4D.RotationInefficient(Vector3D angles)
          */
         
-        angles *= MathF.PI / 180;
+        angles *= Maths.Radians;
         
-        float A = MathF.Cos(angles.x);
-        float B = MathF.Sin(angles.x);
-        float C = MathF.Cos(angles.y);
-        float D = MathF.Sin(angles.y);
-        float E = MathF.Cos(angles.z);
-        float F = MathF.Sin(angles.z);
+        double A = Math.Cos(angles.x);
+        double B = Math.Sin(angles.x);
+        double C = Math.Cos(angles.y);
+        double D = Math.Sin(angles.y);
+        double E = Math.Cos(angles.z);
+        double F = Math.Sin(angles.z);
 
-        float AD = A * D;
-        float BD = B * D;
+        double AD = A * D;
+        double BD = B * D;
 
         /*
          original code was incorrect as the example matrix was transposed
@@ -166,17 +165,17 @@ public sealed partial class Matrix4D
         
         //quaternion = quaternion.Normalised;
         
-        float xx = Q.x * Q.x;
-        float xy = Q.x * Q.y;
-        float xz = Q.x * Q.z;
-        float xw = Q.x * Q.w;
+        double xx = Q.x * Q.x;
+        double xy = Q.x * Q.y;
+        double xz = Q.x * Q.z;
+        double xw = Q.x * Q.w;
         
-        float yy = Q.y * Q.y;
-        float yz = Q.y * Q.z;
-        float yw = Q.y * Q.w;
+        double yy = Q.y * Q.y;
+        double yz = Q.y * Q.z;
+        double yw = Q.y * Q.w;
         
-        float zz = Q.z * Q.z;
-        float zw = Q.z * Q.w;
+        double zz = Q.z * Q.z;
+        double zw = Q.z * Q.w;
         
         return new Matrix4D(
             new Vector4D(1-2*(yy + zz), 2*(xy - zw), 2*(xz + yw), 0),
@@ -187,54 +186,28 @@ public sealed partial class Matrix4D
     }
     
     // rotation matrix from axis-angle
-    public static Matrix4D Rotation(float angle, Vector3D axis)
+    public static Matrix4D Rotation(double theta, Vector3D axis)
     {
         /*
          * Maths for calculation from: https://www.opengl-tutorial.org/assets/faq_quaternions/index.html#Q38
          */
         
         axis = axis.Normalised;
-        angle *= MathF.PI / 180;
+        theta *= Maths.Radians;
         
-        float rcos = MathF.Cos(angle);
-        float rsin = MathF.Sin(angle);
+        double cosTheta = Math.Cos(theta);
+        double sinTheta = Math.Sin(theta);
 
         return new Matrix4D(
-            new Vector4D(rcos + axis.x*axis.x*(1-rcos), -axis.z*rsin + axis.x*axis.y*(1-rcos), axis.y*rsin + axis.x*axis.z*(1-rcos), 0),
-            new Vector4D(axis.z * rsin + axis.y*axis.x*(1-rcos), rcos + axis.y*axis.y*(1-rcos), -axis.x*rsin + axis.y*axis.z*(1-rcos), 0),
-            new Vector4D(-axis.y*rsin + axis.z*axis.x*(1-rcos), axis.x*rsin + axis.y*axis.z*(1-rcos), rcos + axis.z*axis.z*(1-rcos), 0),
+            new Vector4D(cosTheta + axis.x*axis.x*(1-cosTheta), -axis.z*sinTheta + axis.x*axis.y*(1-cosTheta), axis.y*sinTheta + axis.x*axis.z*(1-cosTheta), 0),
+            new Vector4D(axis.z * sinTheta + axis.y*axis.x*(1-cosTheta), cosTheta + axis.y*axis.y*(1-cosTheta), -axis.x*sinTheta + axis.y*axis.z*(1-cosTheta), 0),
+            new Vector4D(-axis.y*sinTheta + axis.z*axis.x*(1-cosTheta), axis.x*sinTheta + axis.y*axis.z*(1-cosTheta), cosTheta + axis.z*axis.z*(1-cosTheta), 0),
             new Vector4D(0, 0, 0, 1)
             );
     }
 
-    public static Matrix4D RotationInefficient(Vector3D angles)
-    {
-        // unsimplified version of Matrix4D.Rotation(Vector3D angles)
-        
-        Matrix4D roll = new(
-            new Vector4D(MathF.Cos(angles.z), MathF.Sin(angles.z), 0, 0),
-            new Vector4D(-MathF.Sin(angles.z), MathF.Cos(angles.z), 0, 0),
-            Vector4D.Z,
-            Vector4D.W);
-
-        Matrix4D pitch = new(
-            Vector4D.X,
-            new Vector4D(0, MathF.Cos(angles.x), MathF.Sin(angles.x), 0),
-            new Vector4D(0, -MathF.Sin(angles.x), MathF.Cos(angles.x), 0),
-            Vector4D.W);
-
-        Matrix4D yaw = new(
-            new Vector4D(MathF.Cos(angles.y), 0, -MathF.Sin(angles.y), 0),
-            Vector4D.Y,
-            new Vector4D(MathF.Sin(angles.y), 0, MathF.Cos(angles.y), 0),
-            Vector4D.W);
-
-        return yaw * (pitch * roll);
-    }
-
     // order of operations: Scale -> Rotate -> Translate
     public static Matrix4D TRS(Matrix4D translation, Matrix4D rotation, Matrix4D scale) => translation * (rotation * scale);
-    
     
     public Matrix4D InverseTranslation => new(Matrix3D.Identity, new Vector4D(-W.x, -W.y, -W.z, 1));
 

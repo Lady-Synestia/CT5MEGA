@@ -3,77 +3,65 @@ using System.Reflection.Metadata;
 
 namespace CT5MEGA;
 
-public sealed partial class Vector3D(float x, float y , float z)
+public sealed partial record Vector3D(double x, double y , double z)
 {
-    public float x { get; set; } = x;
-    public float y { get; set; } = y;
-    public float z { get; set; } = z;
+    public double x { get; } = x;
+    public double y { get; } = y;
+    public double z { get; } = z;
 
     // copy constructor
-    public Vector3D(Vector3D a) : this (a.x, a.y, a.z) { }
+    //public Vector3D(Vector3D a) : this (a.x, a.y, a.z) { }
     
     // implicit conversion from 4D Vector
     public static implicit operator Vector3D(Vector4D v) => new(v.x, v.y, v.z);
     
-    // set values
-    public void Set(Vector3D a)
-    {
-        x = a.x;
-        y = a.y;
-        z = a.z;
-    }
-    
     // x: pitch, y: yaw, z: roll
     public static Vector3D FromAngles(Vector3D angles) => new (
-        MathF.Cos(angles.y) * MathF.Cos(angles.x), 
-        MathF.Sin(angles.x), 
-        MathF.Cos(angles.x) * MathF.Sin(angles.y));
-    public static Vector3D FromAngles2D(float roll) => new(
-        MathF.Cos(roll), 
-        MathF.Sin(roll),
+        Math.Cos(angles.y) * Math.Cos(angles.x), 
+        Math.Sin(angles.x), 
+        Math.Cos(angles.x) * Math.Sin(angles.y));
+    public static Vector3D FromAngles2D(double roll) => new(
+        Math.Cos(roll), 
+        Math.Sin(roll),
         0);
 
 
-    public override string ToString() => $"{MathF.Round(x, 4)}, {MathF.Round(y, 4)}, {MathF.Round(z, 4)}";
+    public override string ToString() => $"{Math.Round(x, 4)}, {Math.Round(y, 4)}, {Math.Round(z, 4)}";
     
     // return values as tuple
-    public (float x, float y, float z) Tuple => (x, y, z);
-    
+    public (double x, double y, double z) Tuple => (x, y, z);
     
 }
 
-public sealed partial class Vector3D
+public sealed partial record Vector3D
 { // vector operations
     
     // using pythagoras
-    public float Magnitude => MathF.Sqrt(x * x + y * y + z * z);
-
+    public double Magnitude => Math.Sqrt(x * x + y * y + z * z);
     public Vector3D Normalised => Normalise(this);
     public static Vector3D Normalise(Vector3D a) => a / a.Magnitude;
-    public void Normalise() => Set(Normalise(this)); // sets vector to its normalised value
     
     // comparing two Vectors
-    public static bool Equals(Vector3D a, Vector3D b) => Math.Abs(a.x - b.x) < 0.00001f && Math.Abs(a.y - b.y) < 0.00001f && Math.Abs(a.z - b.z) < 0.00001f;
-    public static bool operator ==(Vector3D a, Vector3D b) => Equals(a, b);
-    public static bool operator !=(Vector3D a, Vector3D b) => !Equals(a, b);
+    public static bool Equals(Vector3D a, Vector3D b) => Math.Abs(a.x - b.x) < Maths.Tolerance && Math.Abs(a.y - b.y) < Maths.Tolerance && Math.Abs(a.z - b.z) < Maths.Tolerance;
+    //public static bool operator ==(Vector3D a, Vector3D b) => Equals(a, b);
+    //public static bool operator !=(Vector3D a, Vector3D b) => !Equals(a, b);
     
     // Dot product of two vectors
-    public static float Dot(Vector3D a, Vector3D b) => (a.x * b.x) + (a.y * b.y) + (a.z * b.z);
-    public float Dot(Vector3D b) => Dot(this, b); // concise syntax
+    public static double Dot(Vector3D a, Vector3D b) => (a.x * b.x) + (a.y * b.y) + (a.z * b.z);
+    public double Dot(Vector3D b) => Dot(this, b); // concise syntax
     
     // Distance between two vector positions
-    public static float Distance(Vector3D a, Vector3D b)
+    public static double Distance(Vector3D a, Vector3D b)
     {
-        float dx = a.x - b.x;
-        float dy = a.y - b.y;
-        float dz = a.z - b.z;
+        double dx = a.x - b.x;
+        double dy = a.y - b.y;
+        double dz = a.z - b.z;
         
-        return MathF.Sqrt(dx*dx + dy*dy + dz*dz);
+        return Math.Sqrt(dx*dx + dy*dy + dz*dz);
     }
-    public float Distance(Vector3D other) => Distance(this, other); // concise syntax
     
     // Angle between two vectors
-    public static float Angle(Vector3D a, Vector3D b) => MathF.Acos(Dot(a, b) / (a.Magnitude * b.Magnitude));
+    public static double Angle(Vector3D a, Vector3D b) => Math.Acos(Dot(a, b) / (a.Magnitude * b.Magnitude));
     
     // Cross product of two vectors
     public static Vector3D Cross(Vector3D a, Vector3D b) => new(
@@ -82,14 +70,13 @@ public sealed partial class Vector3D
         a.x*b.y - a.y*b.x);
     
     // clamps the magnitude of a Vector, returns new vector
-    public static Vector3D ClampMagnitude(Vector3D a, float maxlength) => a.Magnitude > maxlength ? Normalise(a) * maxlength : a;
-    public void ClampMagnitude(float maxlength) => Set(ClampMagnitude(this, maxlength)); // concise syntax, acts on vector
+    public static Vector3D ClampMagnitude(Vector3D a, double maxlength) => a.Magnitude > maxlength ? Normalise(a) * maxlength : a;
     
     // calculates the midpoint of two vectors - same as Lerp(a, b, 0.5)
     public static Vector3D Midpoint(Vector3D a, Vector3D b) => a + (b - a) * 0.5f;
     
     // calculates point on the line between a and b
-    public static Vector3D Lerp(Vector3D a, Vector3D b, float t) => a + (b - a) * t;
+    public static Vector3D Lerp(Vector3D a, Vector3D b, double t) => a + (b - a) * t;
     
     // calculates the vector from a to b
     public static Vector3D Between(Vector3D a, Vector3D b) => b - a;
@@ -101,20 +88,18 @@ public sealed partial class Vector3D
         Math.Max(a.x, b.x), 
         Math.Max(a.y, b.y), 
         Math.Max(a.z, b.z));
-    public void Maximise(Vector3D b) => Set(Max(this, b)); // concise syntax, acts on this
     
     // returns a vector with the smallest values of each of the vectors
     public static Vector3D Min(Vector3D a, Vector3D b) => new(
         Math.Min(a.x, b.x), 
         Math.Min(a.y, b.y), 
         Math.Min(a.z, b.z));
-    public void Minimise(Vector3D b) => Set(Min(this, b)); // concise syntax, acts on this
     
     // projects a vector onto another vector
     public static Vector3D Project(Vector3D a, Vector3D b) => b * Dot(a, b);
 }
 
-public sealed partial class Vector3D
+public sealed partial record Vector3D
 { // component-wise operations
     
     // vector * vector is the Scalar Product of the vectors
@@ -122,17 +107,17 @@ public sealed partial class Vector3D
         a.x * b.x, 
         a.y * b.y, 
         a.z * b.z);
-    public static Vector3D operator *(Vector3D v, float s) => new (
+    public static Vector3D operator *(Vector3D v, double s) => new (
         v.x * s, 
         v.y * s, 
         v.z * s);
-    public static Vector3D operator *(float s, Vector3D v) => v * s;
+    public static Vector3D operator *(double s, Vector3D v) => v * s;
     
     public static Vector3D operator /(Vector3D a, Vector3D b) => new (
         a.x / b.x, 
         a.y / b.y, 
         a.z / b.z);
-    public static Vector3D operator /(Vector3D a, float s) => new (
+    public static Vector3D operator /(Vector3D a, double s) => new (
         a.x / s, 
         a.y / s, 
         a.z / s);
@@ -148,7 +133,7 @@ public sealed partial class Vector3D
         a.z - b.z);
 }
 
-public sealed partial class Vector3D
+public sealed partial record Vector3D
 { // default vector values
     
     public static Vector3D Zero => new(0, 0, 0);

@@ -1,6 +1,6 @@
 namespace CT5MEGA;
 
-public sealed class Matrix3D
+public sealed record Matrix3D
 {
     public Vector3D F { get; }
     public Vector3D U { get; }
