@@ -38,6 +38,8 @@ public sealed partial class Vector3D(float x, float y , float z)
     
     // return values as tuple
     public (float x, float y, float z) Tuple => (x, y, z);
+    
+    
 }
 
 public sealed partial class Vector3D
@@ -51,12 +53,9 @@ public sealed partial class Vector3D
     public void Normalise() => Set(Normalise(this)); // sets vector to its normalised value
     
     // comparing two Vectors
-    public static bool Equals(Vector3D a, Vector3D b)
-    { 
-        const float tolerance = 0.00001f;
-        return Math.Abs(a.x - b.x) < tolerance && Math.Abs(a.y - b.y) < tolerance && Math.Abs(a.z - b.z) < tolerance;
-    }
-    public bool Equals(Vector3D other) => Equals(this, other); // concise syntax
+    public static bool Equals(Vector3D a, Vector3D b) => Math.Abs(a.x - b.x) < 0.00001f && Math.Abs(a.y - b.y) < 0.00001f && Math.Abs(a.z - b.z) < 0.00001f;
+    public static bool operator ==(Vector3D a, Vector3D b) => Equals(a, b);
+    public static bool operator !=(Vector3D a, Vector3D b) => !Equals(a, b);
     
     // Dot product of two vectors
     public static float Dot(Vector3D a, Vector3D b) => (a.x * b.x) + (a.y * b.y) + (a.z * b.z);
@@ -104,7 +103,7 @@ public sealed partial class Vector3D
         Math.Max(a.z, b.z));
     public void Maximise(Vector3D b) => Set(Max(this, b)); // concise syntax, acts on this
     
-    // returns a vector with the largest values of each of the vectors
+    // returns a vector with the smallest values of each of the vectors
     public static Vector3D Min(Vector3D a, Vector3D b) => new(
         Math.Min(a.x, b.x), 
         Math.Min(a.y, b.y), 

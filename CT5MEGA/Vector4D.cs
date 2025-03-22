@@ -14,7 +14,8 @@ public sealed partial class Vector4D(float x, float y, float z, float w)
         a.y, 
         a.z, 
         a.w) {}
-    public Vector4D(Vector3D a, float w=0) : this (
+    
+    public Vector4D(Vector3D a, float w=1) : this (
         a.x, 
         a.y, 
         a.z, 
