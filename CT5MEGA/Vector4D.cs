@@ -9,13 +9,26 @@ public sealed partial class Vector4D(float x, float y, float z, float w)
     public float z { get; set; } = z;
     public float w { get; set; } = w;
 
-    public Vector4D(Vector4D a) : this (a.x, a.y, a.z, a.w) {}
-    public Vector4D(Vector3D a, float w=0) : this (a.x, a.y, a.z, w) {}
+    public Vector4D(Vector4D a) : this (
+        a.x, 
+        a.y, 
+        a.z, 
+        a.w) {}
+    
+    public Vector4D(Vector3D a, float w=1) : this (
+        a.x, 
+        a.y, 
+        a.z, 
+        w) {}
     
     public (float x, float y, float z, float w) Tuple => (x, y, z, w);
-
-    // gets as a 3D Vector
-    public Vector3D To3D => new(x, y, z); 
+    
+    // implicit conversion from 3D vector
+    public static implicit operator Vector4D(Vector3D v) => new(
+        v.x, 
+        v.y, 
+        v.z, 
+        0);
     
     public void Set(Vector4D a)
     {
@@ -24,8 +37,8 @@ public sealed partial class Vector4D(float x, float y, float z, float w)
         z = a.z;
         w = a.w;
     }
-    
-    public override string ToString() => $"({x}, {y}, {z}, {w})";
+
+    public override string ToString() => $"{MathF.Round(x, 4)}, {MathF.Round(y, 4)}, {MathF.Round(z, 4)}, {MathF.Round(w, 4)}";
 }
 
 public sealed partial class Vector4D
@@ -52,16 +65,40 @@ public sealed partial class Vector4D
 
 public sealed partial class Vector4D
 {
-    public static Vector4D operator *(Vector4D a, Vector4D b) => new (a.x * b.x, a.y * b.y, a.z * b.z, a.w * b.w);
-    public static Vector4D operator *(Vector4D a, float s) => new (a.x * s, a.y * s, a.z * s, a.w * s);
+    public static Vector4D operator *(Vector4D a, Vector4D b) => new (
+        a.x * b.x, 
+        a.y * b.y, 
+        a.z * b.z, 
+        a.w * b.w);
+    public static Vector4D operator *(Vector4D a, float s) => new (
+        a.x * s, 
+        a.y * s, 
+        a.z * s, 
+        a.w * s);
     public static Vector4D operator *(float s, Vector4D a) => a * s;
     
-    public static Vector4D operator /(Vector4D a, Vector4D b) => new (a.x/b.x, a.y/b.y, a.z/b.z, a.w/b.w);
-    public static Vector4D operator /(Vector4D a, float s) => new (a.x/s, a.y/s, a.z/s, a.w/s);
+    public static Vector4D operator /(Vector4D a, Vector4D b) => new (
+        a.x/b.x, 
+        a.y/b.y, 
+        a.z/b.z, 
+        a.w/b.w);
+    public static Vector4D operator /(Vector4D a, float s) => new (
+        a.x/s, 
+        a.y/s, 
+        a.z/s, 
+        a.w/s);
     
-    public static Vector4D operator +(Vector4D a, Vector4D b) => new (a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w);
+    public static Vector4D operator +(Vector4D a, Vector4D b) => new (
+        a.x + b.x, 
+        a.y + b.y, 
+        a.z + b.z, 
+        a.w + b.w);
     
-    public static Vector4D operator -(Vector4D a, Vector4D b) => new (a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w);
+    public static Vector4D operator -(Vector4D a, Vector4D b) => new (
+        a.x - b.x, 
+        a.y - b.y, 
+        a.z - b.z, 
+        a.w - b.w);
 }
 
 
