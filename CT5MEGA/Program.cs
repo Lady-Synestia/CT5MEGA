@@ -2,7 +2,7 @@
 
 Console.WriteLine("Hello, World!\n");
 
-Matrix4D translation = Matrix4D.Translation(new Vector3D(0, 0, 0));
+/*Matrix4D translation = Matrix4D.Translation(new Vector3D(0, 0, 0));
 //Console.WriteLine($"translation:\n{translation}");
 
 Matrix4D scale = Matrix4D.Scale(0.5f);
@@ -50,4 +50,19 @@ if (AxisAlignedBoundingBox.LineIntersection(localBox, l1, l2, out Vector3D inter
 {
     intersect = transform * intersect;
     Console.WriteLine("Intersection found: " + intersect);
-}
+}*/
+
+BoundingCapsule capsule = new(
+    new Vector3D(0, 0, 0), 
+    new Vector3D(0, 2, 0), 
+    0.5);
+Console.WriteLine(capsule);
+
+BoundingCapsule capsule2 = new(
+    new Vector3D(1, 1, 0), 
+    new Vector3D(1, 4, 0), 
+    0.5);
+Console.WriteLine(capsule2);
+
+Console.WriteLine(capsule.ParallelCapsuleIntersect(capsule2));
+Console.WriteLine(capsule.CapsuleIntersect(capsule2));

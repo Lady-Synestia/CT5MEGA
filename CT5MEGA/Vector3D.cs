@@ -37,7 +37,8 @@ public sealed partial record Vector3D
 { // vector operations
     
     // using pythagoras
-    public double Magnitude => Math.Sqrt(x * x + y * y + z * z);
+    public double Magnitude => Math.Sqrt(SqrMagnitude);
+    public double SqrMagnitude => x * x + y * y + z * z;
     public Vector3D Normalised => Normalise(this);
     public static Vector3D Normalise(Vector3D a) => a / a.Magnitude;
     
@@ -51,13 +52,14 @@ public sealed partial record Vector3D
     public double Dot(Vector3D b) => Dot(this, b); // concise syntax
     
     // Distance between two vector positions
-    public static double Distance(Vector3D a, Vector3D b)
+    public static double Distance(Vector3D a, Vector3D b) => Math.Sqrt(DistanceSquared(a, b));
+    public static double DistanceSquared(Vector3D a, Vector3D b)
     {
         double dx = a.x - b.x;
         double dy = a.y - b.y;
         double dz = a.z - b.z;
-        
-        return Math.Sqrt(dx*dx + dy*dy + dz*dz);
+
+        return dx * dx + dy * dy + dz * dz;
     }
     
     // Angle between two vectors
